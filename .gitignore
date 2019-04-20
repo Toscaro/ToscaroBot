@@ -3,6 +3,36 @@
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+<<<<<<< Updated upstream
 config.json
 node_modules
 .DS_Store
+=======
+.DS_Store
+
+ Packages
+node_modules/
+yarn.lock
+package-lock.json
+
+# Log files
+logs/
+*.log
+
+# Authentication
+test/auth.json
+test/auth.js
+docs/deploy/deploy_key
+docs/deploy/deploy_key.pub
+deploy/deploy_key
+deploy/deploy_key.pub
+
+# Miscellaneous
+.tmp/
+docs/docs.json
+webpack/
+
+# ToscaroBot
+database/*
+config.json
+>>>>>>> Stashed changes
