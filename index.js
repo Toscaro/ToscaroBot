@@ -2,8 +2,12 @@ const Discord = require("discord.js");
 const config = require("./config.json");
 const client = new Discord.Client();
 const fs = require("fs");
+const sqlite3 = require("sqlite3").verbose();
+
+let db = new sqlite3.Database("./database/database.db");
 
 client.commands = new Discord.Collection();
+client.prefix = config.prefix;
 
 fs.readdir("./commands/", (err, files) => {
     if (err) { console.log(err); }
@@ -22,8 +26,9 @@ fs.readdir("./commands/", (err, files) => {
     });
 });
 
-
-client.prefix = config.prefix;
+db.run(`CREATE TABLE IF NOT EXISTS servers
+(SERVERID STRING PRIMARY KEY,
+    PREFIX STRING)`);
 
 client.on("ready", () => {
     console.log("Bot on!" + 
@@ -50,5 +55,23 @@ client.on("message", async message => {
         console.log(`Arguments: ${args}`)
     }
 });
+
+//When someone add ToscaroBot in a server
+client.on("guildCreate", async guild => {
+    let serverId = guild.id;
+    let serverName = guild.name;
+    let defaultPrefix = config.prefix;
+    console.log(`New server.. ID: ${serverId}, Name: ${serverName}`);
+    db.run(`INSERT INTO servers (SERVERID, PREFIX)
+    VALUES (${serverId}, "${defaultPrefix}")`);
+});
+
+//When someone remove ToscaroBot from server
+client.on("guildDelete", guild => {
+    let serverId = guild.id;
+    let serverName = guild.name;
+    console.log(`Bye server.. ID: ${serverId}, Name: ${serverName}`);
+    db.run(`DELETE FROM servers WHERE SERVERID = ${serverId}`)
+})
 
 client.login(config.token);

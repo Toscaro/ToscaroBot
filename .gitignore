@@ -3,14 +3,9 @@
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
-<<<<<<< Updated upstream
-config.json
-node_modules
-.DS_Store
-=======
 .DS_Store
 
- Packages
+# Packages
 node_modules/
 yarn.lock
 package-lock.json
@@ -35,4 +30,3 @@ webpack/
 # ToscaroBot
 database/*
 config.json
->>>>>>> Stashed changes
