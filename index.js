@@ -7,6 +7,7 @@ const sqlite3 = require("sqlite3").verbose();
 let db = new sqlite3.Database("./database/database.db");
 
 client.commands = new Discord.Collection();
+client.queries = new Discord.Collection();
 client.prefix = config.prefix;
 
 fs.readdir("./commands/", (err, files) => {
@@ -16,13 +17,28 @@ fs.readdir("./commands/", (err, files) => {
 
     if (jsFiles.length <= 0) {
         console.log("No js commands in commands folder");
-        return;
     }
 
     jsFiles.forEach((f, i) => {
         let filePath = require(`./commands/${f}`);
         console.log(`New command added! ${f}`);
         client.commands.set(filePath.help.name, filePath);
+    });
+});
+
+fs.readdir("./queries/", (err, files) => {
+    if (err) { console.log(err); }
+
+    let queriesJs = files.filter(f => f.split(".").pop() == "js");
+
+    if (queriesJs.length <= 0) {
+        console.log("No queries found");
+    }
+
+    queriesJs.forEach((f, i) => {
+        let filePath = require(`./queries/${f}`);
+        console.log(`New querie: ${f}`);
+        client.queries.set(filePath.help.name, filePath);
     });
 });
 
@@ -62,8 +78,10 @@ client.on("guildCreate", async guild => {
     let serverName = guild.name;
     let defaultPrefix = config.prefix;
     console.log(`New server.. ID: ${serverId}, Name: ${serverName}`);
-    db.run(`INSERT INTO servers (SERVERID, PREFIX)
-    VALUES (${serverId}, "${defaultPrefix}")`);
+    let query = client.queries.get("query");
+    let values = [`SERVERID`, `PREFIX`];
+    let params = [`${serverId}`, `${defaultPrefix}`];
+    query.insert("servers", values, params);
 });
 
 //When someone remove ToscaroBot from server
@@ -71,7 +89,8 @@ client.on("guildDelete", guild => {
     let serverId = guild.id;
     let serverName = guild.name;
     console.log(`Bye server.. ID: ${serverId}, Name: ${serverName}`);
-    db.run(`DELETE FROM servers WHERE SERVERID = ${serverId}`)
-})
+    let query = client.queries.get("query");
+    query.delete("servers", "SERVERID", serverId);
+});
 
 client.login(config.token);
